@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
+import PageHeader from '../Template/pageHeader';
 
 export default class Todo extends Component{
     render(){
         return(
             <div>
-                <h1>ToDo</h1>
+                <PageHeader name="Tarefas" small="Cadastro" />
             </div>
         )
     }
