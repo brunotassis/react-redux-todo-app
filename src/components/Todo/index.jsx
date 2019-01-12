@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+
 import PageHeader from '../Template/pageHeader';
 import TodoForm from './todoForm'
 import TodoList from './todoList'
+
+const URL = 'http://localhost:3003/api/todos'
+
 export default class Todo extends Component{
     constructor(props){
         super(props);
@@ -19,12 +24,13 @@ export default class Todo extends Component{
     }
 
     handleAdd(){
-        let list = this.state.list;
-        list.push(this.state.description);
-        this.setState({ 
-            list,
-            description: ''
-        });
+        if(this.state.description !== ''){
+            let list = this.state.list;
+            list.push(this.state.description);
+            this.setState({ list, description: '' });
+        }else{
+            alert('Escreve algo no campo de tarefas.');
+        }
     }
 
     render(){

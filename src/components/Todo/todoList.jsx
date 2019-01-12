@@ -6,10 +6,7 @@ export default props => (
         <Grid cols='12 12 12 12'>
             <ul>
                 {props.list.map((item, key) => {
-                    return (
-
-                        <li key={key}>{item}</li>
-                    )
+                    return <li key={key}>{item}</li>
                 })}
             </ul>
         </Grid>
