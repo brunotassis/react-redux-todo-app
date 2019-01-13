@@ -12,8 +12,35 @@ export default class Todo extends Component{
         super(props);
         this.state = { description: '', list: [] };
 
-        this.handleChange = this.handleChange.bind(this);
         this.handleAdd = this.handleAdd.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
+        this.handleClear = this.handleClear.bind(this);
+
+        this.handleDelete = this.handleDelete.bind(this);
+        this.handleMarkAsDone = this.handleMarkAsDone.bind(this);
+        this.handleMarkAsPending = this.handleMarkAsPending.bind(this);
+
+        this.refresh();
+    }
+
+    refresh(description = ''){
+        const search = description ? `&description__regex=/${description}/` : '';
+
+        axios.get(`${URL}?sort=-createdAt${search}`)
+            .then(response => {
+                console.log(response.data);
+                const list = response.data;
+                this.setState({list, description});
+            });
+    }
+
+    handleSearch(){
+        this.refresh(this.state.description);
+    }
+
+    handleClear(){
+        this.refresh();
     }
 
     handleChange(e){
@@ -25,25 +52,62 @@ export default class Todo extends Component{
 
     handleAdd(){
         if(this.state.description !== ''){
-            let list = this.state.list;
-            list.push(this.state.description);
-            this.setState({ list, description: '' });
+            const description = this.state.description
+
+            axios.post(URL, { description }).then(() => {
+                this.refresh();
+            }).catch(err => {
+                console.error(err);
+            });
         }else{
-            alert('Escreve algo no campo de tarefas.');
+            alert('Escreva algo no campo de tarefas.');
         }
+    }
+
+    handleDelete(todo){
+        let id = todo._id;
+        axios.delete(`${URL}/${id}`).then(resp => {
+            this.refresh(this.state.description);
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+    handleMarkAsDone(todo){
+        let id = todo._id;
+        axios.put(`${URL}/${id}`, { ...todo, done: true }).then(resp => {
+            this.refresh(this.state.description);
+        }).catch(err => {
+            console.error(err);
+        });
+    }
+
+    handleMarkAsPending(todo){
+        let id = todo._id;
+        axios.put(`${URL}/${id}`, { ...todo, done: false }).then(resp => {
+            this.refresh(this.state.description);
+        }).catch(err => {
+            console.error(err);
+        });
     }
 
     render(){
         return(
             <div>
                 <PageHeader name="Tarefas" small="Cadastro" />
-                <TodoForm handleAdd={this.handleAdd}
+
+                <TodoForm
+                    handleAdd={this.handleAdd}
                     handleChange={this.handleChange}
+                    handleSearch={this.handleSearch}
+                    handleClear={this.handleClear}
                     description={this.state.description} />
 
-                <hr/>
-
-                <TodoList list={this.state.list}/>
+                <TodoList
+                    list={this.state.list}
+                    handleDelete={this.handleDelete}
+                    handleMarkAsDone={this.handleMarkAsDone}
+                    handleMarkAsPending={this.handleMarkAsPending} />
             </div>
         )
     }
